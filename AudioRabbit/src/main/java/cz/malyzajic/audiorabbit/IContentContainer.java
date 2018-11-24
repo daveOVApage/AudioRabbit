@@ -6,7 +6,7 @@ package cz.malyzajic.audiorabbit;
  */
 public interface IContentContainer {
 
-    void setFiller(IMediaFinder finder);
+    void setFinder(IMediaFinder finder);
 
     void fillContainer();
 

@@ -3,6 +3,8 @@ package cz.malyzajic.audiorabbit;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -43,19 +45,23 @@ public class MediaFinder implements IMediaFinder {
         File directory = new File(directoryName);
 
         File[] fList = directory.listFiles();
+        if (fList != null) {
+            for (File file : fList) {
 
-        for (File file : fList) {
-
-            item = new DirectoryItem();
-            item.setFile(file);
-            item.setId(root + (counter++) + getSuffix(file));
-            item.setParentId(parentId);
-            item.setContainer(root);
-            list.add(item);
-            if (file.isDirectory()) {
-                listFilesAndFilesSubDirectories(root, file.getAbsolutePath(), item.getId(), list);
+                item = new DirectoryItem();
+                item.setFile(file);
+                item.setId(root + (counter++) + getSuffix(file));
+                item.setParentId(parentId);
+                item.setContainer(root);
+                list.add(item);
+                if (file.isDirectory()) {
+                    listFilesAndFilesSubDirectories(root, file.getAbsolutePath(), item.getId(), list);
+                }
             }
+        } else {
+            Logger.getLogger(App.class.getName()).log(Level.INFO, "{0} is not directory", directoryName);
         }
+
     }
 
     @Override

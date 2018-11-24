@@ -47,13 +47,13 @@ public class ContentTree implements IContentContainer {
         rootNode = createRootNode();
     }
 
-    protected ContentNode createRootNode() {
+    private ContentNode createRootNode() {
         // create root container
         Container root = new Container();
         root.setId(ROOT_ID);
         root.setParentID("-1");
-        root.setTitle(App.fullAppName + " root directory");
-        root.setCreator(App.fullManufacturer);
+        root.setTitle(App.FULL_APP_NAME + " root directory");
+        root.setCreator(App.FULL_MANUFACTURER);
         root.setRestricted(true);
         root.setSearchable(true);
         root.setWriteStatus(WriteStatus.NOT_WRITABLE);
@@ -61,10 +61,6 @@ public class ContentTree implements IContentContainer {
         ContentNode newRootNode = new ContentNode(ROOT_ID, root);
         contentMap.put(ROOT_ID, newRootNode);
         return newRootNode;
-    }
-
-    public ContentNode getRootNode() {
-        return rootNode;
     }
 
     @Override
@@ -80,19 +76,13 @@ public class ContentTree implements IContentContainer {
         return contentMap.containsKey(id);
     }
 
-    public void addNode(String ID, ContentNode Node) {
+    private void addNode(String ID, ContentNode Node) {
         contentMap.put(ID, Node);
     }
 
-    public void resetRootNode() {
-        contentMap = new HashMap<>();
-        rootNode = createRootNode();
-    }
-
-    protected void fillContainer(List<DirectoryItem> items) {
+    private void fillContainer(List<DirectoryItem> items) {
         System.out.println("Start filling media conteiner");
         for (int i = 0; i < items.size(); i++) {
-            System.out.print(".");
             DirectoryItem fileItem = items.get(i);
             AudioFile af;
             ContentNode mainNode = getNode(fileItem.getParentId());
@@ -141,9 +131,9 @@ public class ContentTree implements IContentContainer {
                 Res res = new Res(mimeType, size, "http://"
                         + App.getAddress() + "/" + id);
 
-//                res.setDuration(duration / (1000 * 60 * 60) + ":"
-//                        + (duration % (1000 * 60 * 60)) / (1000 * 60) + ":"
-//                        + (duration % (1000 * 60)) / 1000);
+                res.setDuration(duration / (1000 * 60 * 60) + ":"
+                        + (duration % (1000 * 60 * 60)) / (1000 * 60) + ":"
+                        + (duration % (1000 * 60)) / 1000);
                 MusicTrack musicTrack = new MusicTrack(id,
                         fileItem.getParentId(), title, creator, null,
                         new PersonWithRole(creator, "Performer"), res);
@@ -163,7 +153,7 @@ public class ContentTree implements IContentContainer {
     }
 
     @Override
-    public void setFiller(IMediaFinder finder) {
+    public void setFinder(IMediaFinder finder) {
         this.mediaFinder = finder;
     }
 
@@ -176,7 +166,7 @@ public class ContentTree implements IContentContainer {
 
     @Override
     public void fillContainer(IMediaFinder finder) {
-        setFiller(finder);
+        setFinder(finder);
         fillContainer();
     }
 

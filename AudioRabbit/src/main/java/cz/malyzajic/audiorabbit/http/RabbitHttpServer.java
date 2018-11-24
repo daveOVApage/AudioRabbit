@@ -17,9 +17,9 @@ import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -45,22 +45,22 @@ public class RabbitHttpServer extends SimpleWebServer {
 
     @Override
     public Response serve(IHTTPSession session) {
-
+        String mime;
         try {
             Map<String, String> header = session.getHeaders();
             Map<String, String> parms = session.getParms();
             String uri = session.getUri();
 
-            LOGGER.info(session.getMethod() + "" + uri + "");
+            LOGGER.log(Level.INFO, "{0}{1}", new Object[]{session.getMethod(), uri});
 
-            Iterator<String> e = header.keySet().iterator();
-            while (e.hasNext()) {
-                String value = e.next();
-            }
-            e = parms.keySet().iterator();
-            while (e.hasNext()) {
-                String value = e.next();
-            }
+//            Iterator<String> e = header.keySet().iterator();
+//            while (e.hasNext()) {
+//                String value = e.next();
+//            }
+//            e = parms.keySet().iterator();
+//            while (e.hasNext()) {
+//                String value = e.next();
+//            }
 
             String itemId = uri.replaceFirst("/", "");
             itemId = URLDecoder.decode(itemId, "UTF-8");
@@ -77,7 +77,6 @@ public class RabbitHttpServer extends SimpleWebServer {
                 uri = newUri;
             }
 
-            String mime = null;
             mime = getMimeByUri(uri);
             return serveFile(uri, header, new File(newUri), mime);
         } catch (UnsupportedEncodingException ex) {
@@ -90,7 +89,7 @@ public class RabbitHttpServer extends SimpleWebServer {
         String mime = null;
         int dot = uri.lastIndexOf('.');
         if (dot >= 0) {
-            mime = (String) theMimeTypes.get(uri.substring(dot + 1).toLowerCase());
+            mime = (String) MIME_TYPES.get(uri.substring(dot + 1).toLowerCase());
         }
         if (mime == null) {
             mime = RabbitHttpServer.DEFAULT_BINARY_MIME;
@@ -227,7 +226,7 @@ public class RabbitHttpServer extends SimpleWebServer {
         }
     }
 
-    private static HashMap theMimeTypes = new HashMap(30);
+    private final static HashMap MIME_TYPES = new HashMap(30);
 
     static {
         StringTokenizer st = new StringTokenizer(
@@ -250,7 +249,7 @@ public class RabbitHttpServer extends SimpleWebServer {
                 + "exe		application/octet-stream "
                 + "class		application/octet-stream ");
         while (st.hasMoreTokens()) {
-            theMimeTypes.put(st.nextToken(), st.nextToken());
+            MIME_TYPES.put(st.nextToken(), st.nextToken());
         }
     }
 

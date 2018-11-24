@@ -40,12 +40,12 @@ import org.fourthline.cling.support.xmicrosoft.AbstractMediaReceiverRegistrarSer
  */
 public class App implements Runnable {
 
-    public static final String fullAppName = "Audio Rabbit Server";
-    public static final String shorAppName = "AR Server";
-    public static final String shortVersionString = "0.1";
-    public static final String fullVersionString = "0.1 version";
-    public static final String fullManufacturer = "David Opletal";
-    public static final String shortManufacturer = "dave@page";
+    public static final String FULL_APP_NAME = "Audio Rabbit Server";
+    public static final String SHORT_APP_NAME = "AR Server";
+    public static final String SHORT_VERSION = "0.1";
+    public static final String FULL_VERSION = "0.1 version";
+    public static final String FULL_MANUFACTURER = "David Opletal";
+    public static final String SHORT_MANUFACTURER = "dave@page";
 
     private final static int PORT = 59160;
     private static InetAddress localAddress;
@@ -54,6 +54,8 @@ public class App implements Runnable {
     private final RabitConfiguration configuration = new RabitConfiguration();
 
     private IContentContainer container;
+
+    private Db database;
 
     public static void main(String[] args) throws Exception {
         // Start a user thread that runs the UPnP stack
@@ -65,10 +67,15 @@ public class App implements Runnable {
     public void run() {
         try {
             localAddress = InetAddress.getLocalHost();
+
+            database = new Db();
+            database.connect();
+            database.testAndPrepareDb();
+
             MediaFinder finder = new MediaFinder();
             finder.setConfiguration(configuration);
             container = new ContentTree();
-            container.setFiller(finder);
+            container.setFinder(finder);
             container.fillContainer();
             httpServer = new RabbitHttpServer(getLocalAddress(), PORT);
             httpServer.setContentContainer(container);
@@ -96,7 +103,7 @@ public class App implements Runnable {
 
         DeviceIdentity identity
                 = new DeviceIdentity(
-                        UDN.uniqueSystemIdentifier(App.fullAppName + App.fullVersionString)
+                        UDN.uniqueSystemIdentifier(App.FULL_APP_NAME + App.FULL_VERSION)
                 );
 
         DeviceType type = new UDADeviceType("MediaServer", 1);
@@ -109,23 +116,23 @@ public class App implements Runnable {
             Logger.getLogger(App.class.getName()).log(Level.SEVERE, null, ex);
         }
         DeviceDetails details = new DeviceDetails(baseUrl,
-                App.fullAppName,
-                new ManufacturerDetails(App.fullManufacturer),
+                App.FULL_APP_NAME,
+                new ManufacturerDetails(App.FULL_MANUFACTURER),
                 new ModelDetails(
-                        App.fullAppName,
-                        App.shorAppName,
-                        App.fullVersionString
+                        App.FULL_APP_NAME,
+                        App.SHORT_APP_NAME,
+                        App.FULL_VERSION
                 ),
                 "ser-0-1",
                 "",
                 presentationUri);
 
-        DeviceDetails details1 = new DeviceDetails(App.fullAppName, new ManufacturerDetails(App.fullManufacturer),
-                new ModelDetails(
-                        App.fullAppName,
-                        App.shorAppName,
-                        App.fullVersionString
-                ));
+//        DeviceDetails details1 = new DeviceDetails(App.FULL_APP_NAME, new ManufacturerDetails(App.FULL_MANUFACTURER),
+//                new ModelDetails(
+//                        App.FULL_APP_NAME,
+//                        App.SHORT_APP_NAME,
+//                        App.FULL_VERSION
+//                ));
 
         Icon icon = null;
 
